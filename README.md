@@ -4,7 +4,7 @@ A floating **stop button** for macOS `say` speech output.
 
 `say` is a great built-in TTS command, but once it starts talking there is no
 built-in way to shut it up from the GUI. `saystop` runs `say` and shows a small,
-always-on-top **Stop speaking** panel near the top of your screen for as long as
+always-on-top **Stop Speaking** panel near the top of your screen for as long as
 speech is playing. Click the button or close the panel to kill the speech
 immediately. The panel never steals keyboard focus.
 
@@ -87,7 +87,7 @@ System Settings > Keyboard > Keyboard Shortcuts > Services.
 
 `saystop` spawns `/usr/bin/say` as a child process and displays a non-activating
 floating `NSPanel`. The panel closes itself when the child exits (including when
-speech ends naturally or the process is killed). Clicking **Stop speaking** or
+speech ends naturally or the process is killed). Clicking **Stop Speaking** or
 closing the window terminates the child.
 
 ## Uninstall

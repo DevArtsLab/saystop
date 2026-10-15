@@ -10,7 +10,7 @@ description: saystop install endpoints and the release checklist. Use when shipp
 ## What it is
 
 Single-file Swift CLI (`Sources/saystop/main.swift`) wrapping `/usr/bin/say`
-with a floating **Stop** panel. MIT, macOS 12+, universal binary, no deps.
+with a floating **Stop Speaking** panel. MIT, macOS 12+, universal binary, no deps.
 Extras: `--install-shim` (a `say` shim that adds the panel to every call) and
 `extras/Stop Speaking.workflow` (Quick Action kill switch).
 
