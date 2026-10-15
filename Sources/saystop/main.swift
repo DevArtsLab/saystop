@@ -164,7 +164,7 @@ let panel = NSPanel(
     backing: .buffered,
     defer: false
 )
-panel.title = "Speaking"
+panel.title = "Say"
 panel.level = .floating
 panel.isFloatingPanel = true
 panel.hidesOnDeactivate = false
