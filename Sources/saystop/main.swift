@@ -171,7 +171,7 @@ panel.hidesOnDeactivate = false
 panel.delegate = handler
 panel.isReleasedWhenClosed = false
 
-let button = NSButton(title: "Stop speaking", target: handler, action: #selector(StopHandler.stop))
+let button = NSButton(title: "Stop Speaking", target: handler, action: #selector(StopHandler.stop))
 button.bezelStyle = .rounded
 button.frame = NSRect(x: (size.width - 126) / 2, y: 12, width: 126, height: 26)
 panel.contentView?.addSubview(button)
