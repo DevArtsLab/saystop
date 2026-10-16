@@ -69,7 +69,14 @@ func isMuted() -> Bool {
     FileManager.default.fileExists(atPath: muteFlagPath())
 }
 
-func setMuted(_ muted: Bool) {
+func notify(_ message: String) {
+    let p = Process()
+    p.executableURL = URL(fileURLWithPath: "/usr/bin/osascript")
+    p.arguments = ["-e", "display notification \"\(message)\" with title \"saystop\""]
+    try? p.run()
+}
+
+func setMuted(_ muted: Bool, quiet: Bool) {
     let path = muteFlagPath()
     if muted {
         let dir = (path as NSString).deletingLastPathComponent
@@ -80,6 +87,7 @@ func setMuted(_ muted: Bool) {
         try? FileManager.default.removeItem(atPath: path)
         print("unmuted")
     }
+    if !quiet { notify(muted ? "Speech muted" : "Speech is on") }
 }
 
 func installShim() {
@@ -133,7 +141,8 @@ func usage() {
     Usage:
       saystop [say-args...]    Speak text with a floating Stop/Pause panel
       saystop --mute           Silence all speech until --unmute
-      saystop --unmute         Re-enable speech
+      saystop --unmute         Re-enable speech (both post a notification;
+                               add --quiet to skip it)
       saystop --mute-status    Show mute state
       saystop --install-shim   Shim `say` so every call gets the button
       saystop --uninstall-shim Remove the shim
@@ -148,8 +157,8 @@ func usage() {
 switch args.first {
 case "--version": print(version); exit(0)
 case "--help", "-h": usage(); exit(0)
-case "--mute": setMuted(true); exit(0)
-case "--unmute": setMuted(false); exit(0)
+case "--mute": setMuted(true, quiet: args.contains("--quiet")); exit(0)
+case "--unmute": setMuted(false, quiet: args.contains("--quiet")); exit(0)
 case "--mute-status": print(isMuted() ? "muted" : "not muted"); exit(0)
 case "--install-shim": installShim(); exit(0)
 case "--uninstall-shim": uninstallShim(); exit(0)

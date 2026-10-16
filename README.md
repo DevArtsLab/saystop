@@ -81,7 +81,8 @@ saystop --mute-status    # check
 Muting drops a flag file at `~/.config/saystop/muted`. Both `saystop`
 invocations and shimmed `say` calls check it and exit silently. Non-speaking
 invocations (`-o` file output) still work while muted, and `/usr/bin/say`
-always bypasses the mute.
+always bypasses the mute. `--mute`/`--unmute` also post a macOS notification;
+append `--quiet` to skip it.
 
 ### Quick Action kill switch and mute toggle
 
