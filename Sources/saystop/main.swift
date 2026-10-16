@@ -16,7 +16,7 @@ import AVFoundation
 // as a /usr/bin/say child with a Stop-only panel. Non-speaking invocations
 // (-o file output, -v ? voice listing) are exec'd with no UI.
 
-let version = "0.1.0"
+let version = "0.2.0"
 let args = Array(CommandLine.arguments.dropFirst())
 
 func stderr(_ s: String) {
