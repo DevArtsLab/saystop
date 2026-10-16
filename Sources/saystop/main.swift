@@ -192,7 +192,7 @@ func parseRequest() -> SpeechRequest? {
 
 // Panel width is derived from these so margins stay even on both sides.
 let panelMargin: CGFloat = 12
-let panelHeight: CGFloat = 56
+let panelHeight: CGFloat = 48
 let buttonWidth: CGFloat = 76
 let buttonHeight: CGFloat = 26
 let buttonGap: CGFloat = 8
