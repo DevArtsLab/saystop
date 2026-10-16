@@ -201,10 +201,10 @@ final class SpeechPanel: NSObject, NSWindowDelegate {
     private let panel: NSPanel
     private weak var pauseButton: NSButton?
     private let onStop: () -> Void
-    private var onTogglePause: ((Bool) -> Bool)?
+    private var onTogglePause: ((Bool) -> Void)?
     private var paused = false
 
-    init(hasPause: Bool, onStop: @escaping () -> Void, onTogglePause: ((Bool) -> Bool)? = nil) {
+    init(hasPause: Bool, onStop: @escaping () -> Void, onTogglePause: ((Bool) -> Void)? = nil) {
         self.onStop = onStop
         self.onTogglePause = onTogglePause
         let count = hasPause ? 2 : 1
@@ -256,7 +256,8 @@ final class SpeechPanel: NSObject, NSWindowDelegate {
 
     @objc private func pausePressed() {
         guard let toggle = onTogglePause else { return }
-        paused = toggle(!paused)
+        paused.toggle()
+        toggle(paused)
         pauseButton?.title = paused ? "Resume" : "Pause"
     }
 
@@ -295,7 +296,6 @@ if let req = parseRequest(), !req.text.trimmingCharacters(in: .whitespacesAndNew
             } else {
                 _ = synth.continueSpeaking()
             }
-            return synth.isPaused
         }
     )
     controller.show()
