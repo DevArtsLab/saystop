@@ -86,11 +86,13 @@ System Settings > Keyboard > Keyboard Shortcuts > Services.
 
 ## How it works
 
-`saystop` spawns `/usr/bin/say` as a child process and displays a non-activating
-floating `NSPanel`. The panel closes itself when the child exits (including when
-speech ends naturally or the process is killed). Clicking **Stop** or closing
-the window terminates the child. Clicking **Pause** suspends the child with
-`SIGSTOP`; the button becomes **Resume** and continues it with `SIGCONT`.
+For plain speech (text plus `-v`, `-r`, `-f`), `saystop` speaks through
+`AVSpeechSynthesizer` and displays a non-activating floating `NSPanel`. The
+panel closes itself when speech ends. Clicking **Stop** or closing the window
+stops speech immediately; **Pause** suspends at the next word boundary and
+becomes **Resume**. Invocations `saystop` cannot speak itself run as a
+`/usr/bin/say` child process with a Stop-only panel, and non-speaking
+invocations (`-o`, `-v ?`) are exec'd with no panel at all.
 
 ## Uninstall
 
