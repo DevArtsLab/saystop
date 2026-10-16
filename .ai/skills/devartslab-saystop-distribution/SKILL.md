@@ -13,8 +13,11 @@ Single-file Swift CLI (`Sources/saystop/main.swift`) with a floating
 **Stop/Pause** panel for speech output. Speaks via `AVSpeechSynthesizer`
 in-process for text/`-v`/`-r`/`-f`; other invocations run as a `/usr/bin/say`
 child with a Stop-only panel. MIT, macOS 12+, universal binary, no deps.
-Extras: `--install-shim` (a `say` shim that adds the panel to every call) and
-`extras/Stop Speaking.workflow` (Quick Action kill switch).
+Extras: `--install-shim` (a `say` shim that adds the panel to every call),
+`--mute`/`--unmute` (a `~/.config/saystop/muted` flag file silencing all
+speech, honored by the shim and CLI, posting a notification unless `--quiet`),
+`extras/Stop Speaking.workflow` (Quick Action kill switch), and
+`extras/Toggle Speech.workflow` (Quick Action mute toggle with notification).
 
 ## Endpoints
 
