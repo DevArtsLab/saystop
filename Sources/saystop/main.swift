@@ -5,6 +5,9 @@ import AVFoundation
 //
 // Usage modes:
 //   saystop [say-args...]        Speak with a floating Stop/Pause panel.
+//   saystop --mute               Silence all speech until --unmute.
+//   saystop --unmute             Re-enable speech.
+//   saystop --mute-status        Show whether speech is muted.
 //   saystop --install-shim       Create a `say` shim so every `say` call gets the panel.
 //   saystop --uninstall-shim     Remove the shim.
 //   saystop --shim-status        Show whether the shim is installed.
@@ -57,6 +60,28 @@ func shimBinDir() -> String {
 
 func shimPath() -> String { shimBinDir() + "/say" }
 
+// Presence of this file mutes all saystop/shim speech.
+func muteFlagPath() -> String {
+    NSHomeDirectory() + "/.config/saystop/muted"
+}
+
+func isMuted() -> Bool {
+    FileManager.default.fileExists(atPath: muteFlagPath())
+}
+
+func setMuted(_ muted: Bool) {
+    let path = muteFlagPath()
+    if muted {
+        let dir = (path as NSString).deletingLastPathComponent
+        try? FileManager.default.createDirectory(atPath: dir, withIntermediateDirectories: true)
+        FileManager.default.createFile(atPath: path, contents: nil)
+        print("muted: speech silenced until `saystop --unmute`")
+    } else {
+        try? FileManager.default.removeItem(atPath: path)
+        print("unmuted")
+    }
+}
+
 func installShim() {
     let dir = shimBinDir()
     try? FileManager.default.createDirectory(atPath: dir, withIntermediateDirectories: true)
@@ -69,7 +94,7 @@ func installShim() {
             exit(1)
         }
     }
-    let script = "#!/bin/sh\n# saystop shim: gives every `say` call a floating stop button.\n# Remove this file or use /usr/bin/say directly to bypass.\nexec \"\(executablePath())\" \"$@\"\n"
+    let script = "#!/bin/sh\n# saystop shim: gives every `say` call a floating stop button.\n# Remove this file or use /usr/bin/say directly to bypass.\n[ -f \"$HOME/.config/saystop/muted\" ] && exit 0\nexec \"\(executablePath())\" \"$@\"\n"
     do {
         try script.write(toFile: path, atomically: true, encoding: .utf8)
         try FileManager.default.setAttributes([.posixPermissions: 0o755], ofItemAtPath: path)
@@ -107,6 +132,9 @@ func usage() {
 
     Usage:
       saystop [say-args...]    Speak text with a floating Stop/Pause panel
+      saystop --mute           Silence all speech until --unmute
+      saystop --unmute         Re-enable speech
+      saystop --mute-status    Show mute state
       saystop --install-shim   Shim `say` so every call gets the button
       saystop --uninstall-shim Remove the shim
       saystop --shim-status    Show shim status
@@ -120,6 +148,9 @@ func usage() {
 switch args.first {
 case "--version": print(version); exit(0)
 case "--help", "-h": usage(); exit(0)
+case "--mute": setMuted(true); exit(0)
+case "--unmute": setMuted(false); exit(0)
+case "--mute-status": print(isMuted() ? "muted" : "not muted"); exit(0)
 case "--install-shim": installShim(); exit(0)
 case "--uninstall-shim": uninstallShim(); exit(0)
 case "--shim-status": shimStatus(); exit(0)
@@ -134,6 +165,9 @@ for (i, a) in args.enumerated() {
     if a == "--voice=?" { bypass = true }
 }
 if bypass { execSay() }
+
+// Muted invocations exit silently. Non-speaking invocations above are exempt.
+if isMuted() { exit(0) }
 
 // MARK: - Request parsing
 

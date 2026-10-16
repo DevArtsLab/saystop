@@ -70,6 +70,19 @@ saystop --uninstall-shim  # remove
 /usr/bin/say "..."        # always bypasses the shim
 ```
 
+### Mute switch
+
+```sh
+saystop --mute           # silence all speech until unmuted
+saystop --unmute         # re-enable
+saystop --mute-status    # check
+```
+
+Muting drops a flag file at `~/.config/saystop/muted`. Both `saystop`
+invocations and shimmed `say` calls check it and exit silently. Non-speaking
+invocations (`-o` file output) still work while muted, and `/usr/bin/say`
+always bypasses the mute.
+
 ### Quick Action kill switch
 
 `extras/Stop Speaking.workflow` is a macOS Quick Action that runs
