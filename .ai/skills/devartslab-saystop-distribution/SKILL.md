@@ -36,8 +36,9 @@ make && ./build/saystop "test"
 ```
 
 - PATH `saystop` and the `say` shim still run the installed binary. The shim
-  execs a hardcoded absolute path; to test it, run `./build/saystop
---install-shim` or overwrite the installed binary (see Gotchas).
+  execs a PATH-visible `saystop` (survives brew upgrades) or falls back to the
+  resolved binary path; to test it, run `./build/saystop --install-shim` or
+  overwrite the installed binary (see Gotchas).
 - Unsure which build a binary is? `stat -f %Sm` both files, or
   `strings <bin> | grep <text>`.
 

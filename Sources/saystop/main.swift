@@ -19,7 +19,7 @@ import AVFoundation
 // as a /usr/bin/say child with a Stop-only panel. Non-speaking invocations
 // (-o file output, -v ? voice listing) are exec'd with no UI.
 
-let version = "0.3.0"
+let version = "0.3.1"
 let args = Array(CommandLine.arguments.dropFirst())
 
 func stderr(_ s: String) {
@@ -38,9 +38,28 @@ func executablePath() -> String {
     var size = UInt32(buf.count)
     _NSGetExecutablePath(&buf, &size)
     let path = String(cString: buf)
-    let resolved = path.withCString { realpath($0, nil) }
+    return resolvedPath(path)
+}
+
+func resolvedPath(_ path: String) -> String {
+    guard let resolved = path.withCString({ realpath($0, nil) }) else { return path }
     defer { free(resolved) }
-    return resolved.map { String(cString: $0) } ?? path
+    return String(cString: resolved)
+}
+
+// Prefer a PATH-visible `saystop` (e.g. a brew-managed symlink) as the shim's
+// exec target so upgrades that relocate the real binary do not break it.
+func shimTargetPath() -> String {
+    let target = executablePath()
+    let pathDirs = (ProcessInfo.processInfo.environment["PATH"] ?? "").split(separator: ":")
+    for dir in pathDirs {
+        let candidate = String(dir) + "/saystop"
+        if FileManager.default.isExecutableFile(atPath: candidate),
+           resolvedPath(candidate) == target {
+            return candidate
+        }
+    }
+    return target
 }
 
 // First writable bin dir that precedes /usr/bin in PATH.
@@ -102,7 +121,7 @@ func installShim() {
             exit(1)
         }
     }
-    let script = "#!/bin/sh\n# saystop shim: gives every `say` call a floating stop button.\n# Remove this file or use /usr/bin/say directly to bypass.\n[ -f \"$HOME/.config/saystop/muted\" ] && exit 0\nexec \"\(executablePath())\" \"$@\"\n"
+    let script = "#!/bin/sh\n# saystop shim: gives every `say` call a floating stop button.\n# Remove this file or use /usr/bin/say directly to bypass.\n[ -f \"$HOME/.config/saystop/muted\" ] && exit 0\nexec \"\(shimTargetPath())\" \"$@\"\n"
     do {
         try script.write(toFile: path, atomically: true, encoding: .utf8)
         try FileManager.default.setAttributes([.posixPermissions: 0o755], ofItemAtPath: path)
