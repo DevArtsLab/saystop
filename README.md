@@ -83,18 +83,20 @@ invocations and shimmed `say` calls check it and exit silently. Non-speaking
 invocations (`-o` file output) still work while muted, and `/usr/bin/say`
 always bypasses the mute.
 
-### Quick Action kill switch
+### Quick Action kill switch and mute toggle
 
 `extras/Stop Speaking.workflow` is a macOS Quick Action that runs
-`killall say`. Install it to get a menu-bar kill switch plus an assignable
-global hotkey:
+`killall say`. `extras/Toggle Speech.workflow` toggles the mute flag and posts
+a notification confirming the new state. Install either or both for Services
+menu entries plus assignable global hotkeys:
 
 ```sh
 cp -R "extras/Stop Speaking.workflow" ~/Library/Services/
+cp -R "extras/Toggle Speech.workflow" ~/Library/Services/
 /System/Library/CoreServices/pbs -flush
 ```
 
-Then find it under any app's **App Name > Services** menu, or bind a hotkey in
+Then find them under any app's **App Name > Services** menu, or bind hotkeys in
 System Settings > Keyboard > Keyboard Shortcuts > Services.
 
 ## How it works
