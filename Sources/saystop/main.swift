@@ -145,10 +145,27 @@ do { try proc.run() } catch {
 
 final class StopHandler: NSObject, NSWindowDelegate {
     let proc: Process
+    var paused = false
+    weak var pauseButton: NSButton?
     init(_ proc: Process) { self.proc = proc }
     @objc func stop() {
-        if proc.isRunning { proc.terminate() }
+        if proc.isRunning {
+            if paused { kill(proc.processIdentifier, SIGCONT) }
+            proc.terminate()
+        }
         NSApp.terminate(nil)
+    }
+    @objc func togglePause() {
+        guard proc.isRunning else { return }
+        if paused {
+            kill(proc.processIdentifier, SIGCONT)
+            paused = false
+            pauseButton?.title = "Pause"
+        } else {
+            kill(proc.processIdentifier, SIGSTOP)
+            paused = true
+            pauseButton?.title = "Resume"
+        }
     }
     func windowWillClose(_ notification: Notification) { stop() }
 }
@@ -171,10 +188,20 @@ panel.hidesOnDeactivate = false
 panel.delegate = handler
 panel.isReleasedWhenClosed = false
 
-let button = NSButton(title: "Stop Speaking", target: handler, action: #selector(StopHandler.stop))
-button.bezelStyle = .rounded
-button.frame = NSRect(x: (size.width - 126) / 2, y: 12, width: 126, height: 26)
-panel.contentView?.addSubview(button)
+let buttonW: CGFloat = 76
+let gap: CGFloat = 8
+let startX = (size.width - (buttonW * 2 + gap)) / 2
+
+let stopButton = NSButton(title: "Stop", target: handler, action: #selector(StopHandler.stop))
+stopButton.bezelStyle = .rounded
+stopButton.frame = NSRect(x: startX, y: 12, width: buttonW, height: 26)
+panel.contentView?.addSubview(stopButton)
+
+let pauseButton = NSButton(title: "Pause", target: handler, action: #selector(StopHandler.togglePause))
+pauseButton.bezelStyle = .rounded
+pauseButton.frame = NSRect(x: startX + buttonW + gap, y: 12, width: buttonW, height: 26)
+panel.contentView?.addSubview(pauseButton)
+handler.pauseButton = pauseButton
 
 if let screen = NSScreen.main {
     let f = screen.visibleFrame
